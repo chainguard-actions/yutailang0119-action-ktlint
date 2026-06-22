@@ -1,15 +1,54 @@
-# yutailang0119/action-ktlint
+<a href="https://github.com/yutailang0119/action-ktlint/actions"><img alt="action-ktlint status" src="https://github.com/yutailang0119/action-ktlint/workflows/build-test/badge.svg"></a>
 
-A tool to enforce Kotlin style and conventions
+# GitHub Action for ktlint
 
-Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/yutailang0119/action-ktlint](https://github.com/yutailang0119/action-ktlint).
+This Action generates annotations from [ktlint](https://ktlint.github.io) Report XML.
 
-## Versions
+## Usage
 
-| Version | Tag | Upstream commit |
-|---------|-----|-----------------|
-| v4.0.0 | [`v4.0.0`](https://github.com/chainguard-actions/yutailang0119-action-ktlint/tree/v4.0.0) | [`789ab95`](https://github.com/yutailang0119/action-ktlint/commit/789ab951bb2d946262f55f509c77c1c47b9ec954) |
-| v5.0.0 | [`v5.0.0`](https://github.com/chainguard-actions/yutailang0119-action-ktlint/tree/v5.0.0) | [`c565887`](https://github.com/yutailang0119/action-ktlint/commit/c565887e2966973a1a7f71603f2b8680c82d317c) |
+An example workflow(.github/workflows/ktlint.yml) to executing ktlint follows:
+
+```yml
+name: ktlint
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ktlint.yml
+      - 'src/**/*.kt'
+      - '**.kts'
+
+jobs:
+  ktlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - run: |
+          curl -sSLO https://github.com/pinterest/ktlint/releases/download/1.2.1/ktlint && chmod a+x ktlint && sudo mv ktlint /usr/local/bin/
+      - name: run ktlint
+        run: |
+          ktlint --reporter=checkstyle,output=build/ktlint-report.xml
+        continue-on-error: true
+      - uses: yutailang0119/action-ktlint@v4
+        with:
+          report-path: build/*.xml # Support glob patterns by https://www.npmjs.com/package/@actions/glob
+          ignore-warnings: true # Ignore Lint Warnings
+        continue-on-error: false # If annotations contain error of severity, action-ktlint exit 1.
+```
+
+## Author
+
+[Yutaro Muta](https://github.com/yutailang0119)
+
+## References
+
+- Generated from [actions/typescript-action](https://github.com/actions/typescript-action) as template.
+
+## License
+
+action-ktlint is available under the MIT license. See [the LICENSE file](./LICENSE) for more info.
 
 ## Privacy
 
