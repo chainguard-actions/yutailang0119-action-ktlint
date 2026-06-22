@@ -1,0 +1,35 @@
+name: Test ktlint report with warnings only (action should succeed)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create ktlint report with warnings only
+        run: |
+          mkdir -p /tmp/ktlint-reports
+          cat > /tmp/ktlint-reports/ktlint-warnings.xml << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <checkstyle version="8.0">
+            <file name="Bar.kt">
+              <error line="10" column="1" severity="warning" message="Needless blank line(s)" source="no-consecutive-blank-lines"/>
+              <error line="25" column="5" severity="warning" message="Missing newline before '}'" source="no-empty-class-body"/>
+            </file>
+            <file name="Baz.kts">
+              <error line="5" column="1" severity="warning" message="Wildcard import" source="no-wildcard-imports"/>
+            </file>
+          </checkstyle>
+          EOF
+
+      - id: action
+        uses: .
+        with:
+          report-path: /tmp/ktlint-reports/ktlint-warnings.xml
+          follow-symbolic-links: 'false'
+
+      - name: Assert action succeeded (warnings do not cause failure)
+        run: |
+          echo "Action completed successfully with warnings-only report"
+          echo "PASS: warnings do not cause the action to fail"

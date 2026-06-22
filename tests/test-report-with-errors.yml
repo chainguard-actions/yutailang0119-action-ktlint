@@ -1,0 +1,39 @@
+name: Test ktlint report with errors (action should fail)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create ktlint report with errors
+        run: |
+          mkdir -p /tmp/ktlint-reports
+          cat > /tmp/ktlint-reports/ktlint-report-errors.xml << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <checkstyle version="8.0">
+            <file name="Foo.kt">
+              <error line="3" column="1" severity="error" message="Unused import" source="no-unused-imports"/>
+              <error line="22" column="1" severity="warning" message="Needless blank line(s)" source="no-consecutive-blank-lines"/>
+            </file>
+          </checkstyle>
+          EOF
+
+      - id: action
+        uses: .
+        with:
+          report-path: /tmp/ktlint-reports/ktlint-report-errors.xml
+          follow-symbolic-links: 'false'
+        continue-on-error: true
+
+      - name: Assert action failed due to ktlint errors
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "actual outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail when report contains errors, but outcome was '$OUTCOME'"
+            exit 1
+          fi
+          echo "PASS: action correctly failed when report contained errors"
