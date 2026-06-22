@@ -9,6 +9,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
 | v4.0.0 | [`v4.0.0`](https://github.com/chainguard-actions/yutailang0119-action-ktlint/tree/v4.0.0) | [`789ab95`](https://github.com/yutailang0119/action-ktlint/commit/789ab951bb2d946262f55f509c77c1c47b9ec954) |
+| v5.0.0 | [`v5.0.0`](https://github.com/chainguard-actions/yutailang0119-action-ktlint/tree/v5.0.0) | [`c565887`](https://github.com/yutailang0119/action-ktlint/commit/c565887e2966973a1a7f71603f2b8680c82d317c) |
 
 ## Privacy
 
