@@ -1,0 +1,31 @@
+name: Test ktlint report with warnings only
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create ktlint checkstyle report with warnings
+        run: |
+          mkdir -p /tmp/ktlint-reports
+          cat > /tmp/ktlint-reports/ktlint-report.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <checkstyle version="8.0">
+            <file name="src/main/kotlin/com/example/Main.kt">
+              <error line="10" column="1" severity="warning" message="Unnecessary semicolon" source="standard:no-semi"/>
+              <error line="20" column="5" severity="warning" message="Missing newline before '}'" source="standard:curly-spacing"/>
+            </file>
+          </checkstyle>
+          EOF
+
+      - id: action
+        uses: .
+        with:
+          report-path: /tmp/ktlint-reports/*.xml
+
+      - name: Assert action succeeded with warnings-only report
+        run: |
+          echo "Action completed successfully with warnings-only report (warnings do not cause failure)"
+          echo "PASS"

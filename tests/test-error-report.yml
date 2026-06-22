@@ -1,0 +1,38 @@
+name: Test ktlint report with errors causes failure
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create ktlint checkstyle report with errors
+        run: |
+          mkdir -p /tmp/ktlint-reports
+          cat > /tmp/ktlint-reports/ktlint-report.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <checkstyle version="8.0">
+            <file name="src/main/kotlin/com/example/Main.kt">
+              <error line="5" column="1" severity="error" message="Wildcard import" source="standard:no-wildcard-imports"/>
+              <error line="15" column="3" severity="error" message="Unexpected blank line(s) before '}'" source="standard:no-blank-line-before-rbrace"/>
+            </file>
+          </checkstyle>
+          EOF
+
+      - id: action
+        uses: .
+        with:
+          report-path: /tmp/ktlint-reports/*.xml
+        continue-on-error: true
+
+      - name: Assert action failed due to errors in report
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "action outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail when report contains errors, but outcome was '$OUTCOME'"
+            exit 1
+          fi
+          echo "PASS: action correctly failed when report contained errors"

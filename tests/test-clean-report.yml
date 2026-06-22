@@ -1,0 +1,29 @@
+name: Test clean ktlint report
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create clean ktlint checkstyle report
+        run: |
+          mkdir -p /tmp/ktlint-reports
+          cat > /tmp/ktlint-reports/ktlint-report.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <checkstyle version="8.0">
+            <file name="src/main/kotlin/com/example/Main.kt">
+            </file>
+          </checkstyle>
+          EOF
+
+      - id: action
+        uses: .
+        with:
+          report-path: /tmp/ktlint-reports/*.xml
+
+      - name: Assert action succeeded with clean report
+        run: |
+          echo "Action completed successfully with a clean report"
+          echo "PASS"
