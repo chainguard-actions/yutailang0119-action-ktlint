@@ -1,4 +1,4 @@
-name: Test ktlint report with warnings ignored
+name: Test ignore-warnings flag
 on:
   workflow_dispatch:
 jobs:
@@ -6,28 +6,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Create ktlint checkstyle report with warnings only
-        run: |
-          mkdir -p /tmp/ktlint-reports
-          cat > /tmp/ktlint-reports/report-warnings.xml << 'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <checkstyle version="8.0">
-            <file name="src/main/kotlin/com/example/Main.kt">
-              <error line="3" column="1" severity="warning" message="Wildcard import" source="standard:no-wildcard-imports"/>
-              <error line="7" column="5" severity="warning" message="Missing trailing comma" source="standard:trailing-comma-on-call-site"/>
-            </file>
-          </checkstyle>
-          EOF
-
       - name: Run action with warnings-only report and ignore-warnings enabled
         id: action
         uses: .
         with:
-          report-path: /tmp/ktlint-reports/report-warnings.xml
+          report-path: tests/fixtures/warnings-only-report.xml
           ignore-warnings: 'true'
-
-      - name: Assert action succeeded (warnings ignored)
+      - name: Assert action succeeded with warnings ignored
         run: |
-          echo "Action completed successfully with warnings ignored"
-          echo "PASS"
+          echo "PASS: action completed successfully with ignore-warnings=true"

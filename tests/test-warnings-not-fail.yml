@@ -1,0 +1,17 @@
+name: Test warnings do not cause failure
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run action with warnings-only report (ignore-warnings false)
+        id: action
+        uses: .
+        with:
+          report-path: tests/fixtures/warnings-only-report.xml
+          ignore-warnings: 'false'
+      - name: Assert action succeeded (warnings do not cause failure)
+        run: |
+          echo "PASS: action completed successfully — warnings alone do not cause failure"
