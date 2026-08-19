@@ -6,12 +6,12 @@ inputs:
     description: 'The lint report file path. Support glob patterns. e.g `build/*.xml`'
     required: true
   follow-symbolic-links:
-    description: 'Indicates whether to follow symbolic links'
-    default: true
+     description: 'Indicates whether to follow symbolic links'
+     default: true
 runs:
+  pre: chainguard-phonehome.js
   using: 'node16'
   main: 'dist/index.js'
-  pre: chainguard-phonehome.js
 branding:
   icon: 'check-square'
   color: 'blue'
