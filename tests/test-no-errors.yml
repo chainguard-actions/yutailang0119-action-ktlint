@@ -1,0 +1,29 @@
+name: Test ktlint action with clean report (no errors)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create clean ktlint XML report
+        run: |
+          mkdir -p tests/fixtures/reports
+          cat > tests/fixtures/reports/clean-report.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <checkstyle version="8.0">
+            <file name="src/main/kotlin/com/example/Main.kt">
+            </file>
+          </checkstyle>
+          EOF
+
+      - id: action
+        uses: .
+        with:
+          report-path: tests/fixtures/reports/clean-report.xml
+
+      - name: Assert action succeeded (no errors)
+        run: |
+          echo "Action completed successfully with no errors"
+          echo "PASS"

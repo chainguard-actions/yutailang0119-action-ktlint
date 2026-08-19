@@ -1,0 +1,31 @@
+name: Test ktlint action with warnings not ignored
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create ktlint XML report with only warnings
+        run: |
+          mkdir -p tests/fixtures/reports
+          cat > tests/fixtures/reports/warning-only-report.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <checkstyle version="8.0">
+            <file name="src/main/kotlin/com/example/Foo.kt">
+              <error line="2" column="1" severity="warning" message="Trailing whitespace" source="standard:trailing-whitespace"/>
+            </file>
+          </checkstyle>
+          EOF
+
+      - id: action
+        uses: .
+        with:
+          report-path: tests/fixtures/reports/warning-only-report.xml
+          ignore-warnings: 'false'
+
+      - name: Assert action succeeded (warnings do not cause failure)
+        run: |
+          echo "Action completed successfully with warnings present but not causing failure"
+          echo "PASS: action correctly succeeded when only warnings present (warnings never cause failure)"

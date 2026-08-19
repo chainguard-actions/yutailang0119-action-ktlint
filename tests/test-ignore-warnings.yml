@@ -1,4 +1,4 @@
-name: Test ktlint ignore-warnings flag
+name: Test ktlint action with warnings ignored
 on:
   workflow_dispatch:
 jobs:
@@ -7,27 +7,26 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Create ktlint report with warnings only
+      - name: Create ktlint XML report with only warnings
         run: |
-          mkdir -p /tmp/ktlint-reports
-          cat > /tmp/ktlint-reports/ktlint-report.xml << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
+          mkdir -p tests/fixtures/reports
+          cat > tests/fixtures/reports/warning-report.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
           <checkstyle version="8.0">
-            <file name="Foo.kt">
-              <error line="22" column="1" severity="warning" message="Needless blank line(s)" source="no-consecutive-blank-lines"/>
+            <file name="src/main/kotlin/com/example/Main.kt">
+              <error line="3" column="1" severity="warning" message="Unnecessary semicolon" source="standard:no-semi"/>
+              <error line="7" column="5" severity="warning" message="Trailing whitespace" source="standard:trailing-whitespace"/>
             </file>
           </checkstyle>
           EOF
 
       - id: action
-        name: Run ktlint action with ignore-warnings enabled
         uses: .
         with:
-          report-path: /tmp/ktlint-reports/ktlint-report.xml
-          follow-symbolic-links: 'true'
+          report-path: tests/fixtures/reports/warning-report.xml
           ignore-warnings: 'true'
 
-      - name: Assert action succeeded with ignore-warnings
+      - name: Assert action succeeded when warnings are ignored
         run: |
-          echo "Action completed successfully - warnings were ignored"
-          echo "PASS"
+          echo "Action completed successfully with warnings ignored"
+          echo "PASS: action correctly succeeded when only warnings present and ignore-warnings=true"

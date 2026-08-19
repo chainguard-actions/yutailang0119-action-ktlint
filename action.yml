@@ -1,12 +1,15 @@
 name: GitHub Action for ktlint
 description: A tool to enforce Kotlin style and conventions
 author: yutailang0119
+
 branding:
   icon: check-square
   color: purple
+
 inputs:
   report-path:
-    description: The lint report file path. Support glob patterns. e.g `build/*.xml`
+    description:
+      The lint report file path. Support glob patterns. e.g `build/*.xml`
     required: true
   follow-symbolic-links:
     description: Indicates whether to follow symbolic links
@@ -14,7 +17,8 @@ inputs:
   ignore-warnings:
     description: Ignore Lint Warnings
     default: 'false'
+
 runs:
+  pre: chainguard-phonehome.js
   using: node20
   main: dist/index.js
-  pre: chainguard-phonehome.js
