@@ -1,4 +1,4 @@
-name: Test ignore-warnings suppresses warning annotations
+name: Test report with warnings only does not fail
 on:
   workflow_dispatch:
 jobs:
@@ -12,8 +12,8 @@ jobs:
         uses: .
         with:
           report-path: 'ktlint-report.xml'
-          ignore-warnings: 'true'
-      - name: Assert action succeeded with ignore-warnings enabled
+          ignore-warnings: 'false'
+      - name: Assert action succeeded (warnings do not cause failure)
         run: |
-          echo "Action completed successfully with ignore-warnings=true"
-          echo "PASS: warnings were ignored and action did not fail"
+          echo "Action completed successfully with a warnings-only report"
+          echo "PASS: warnings alone do not cause the action to fail"

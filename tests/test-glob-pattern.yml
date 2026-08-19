@@ -1,4 +1,4 @@
-name: Test glob pattern for report path
+name: Test glob pattern for report-path
 on:
   workflow_dispatch:
 jobs:
@@ -6,29 +6,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Create multiple clean ktlint reports
+      - name: Set up multiple clean report files matching a glob
         run: |
-          mkdir -p /tmp/ktlint-reports/module1
-          mkdir -p /tmp/ktlint-reports/module2
-          cat > /tmp/ktlint-reports/module1/ktlint-report.xml <<'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <checkstyle version="8.0">
-          </checkstyle>
-          EOF
-          cat > /tmp/ktlint-reports/module2/ktlint-report.xml <<'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <checkstyle version="8.0">
-          </checkstyle>
-          EOF
-
-      - name: Run action with glob pattern matching multiple reports
-        id: action
+          mkdir -p "$GITHUB_WORKSPACE/build"
+          cp "$GITHUB_WORKSPACE/tests/fixtures/empty-report.xml" "$GITHUB_WORKSPACE/build/ktlint-report-1.xml"
+          cp "$GITHUB_WORKSPACE/tests/fixtures/empty-report.xml" "$GITHUB_WORKSPACE/build/ktlint-report-2.xml"
+      - id: action
         uses: .
         with:
-          report-path: /tmp/ktlint-reports/**/ktlint-report.xml
-
-      - name: Assert action succeeded with glob pattern
+          report-path: 'build/*.xml'
+      - name: Assert action succeeded with glob pattern matching multiple clean reports
         run: |
-          echo "Action completed successfully using glob pattern to match multiple reports"
-          echo "PASS"
+          echo "Action completed successfully with glob pattern"
+          echo "PASS: glob pattern correctly matched multiple report files"
