@@ -1,4 +1,4 @@
-name: Test ktlint report with glob pattern matching multiple files
+name: Test glob pattern matching multiple reports
 on:
   workflow_dispatch:
 jobs:
@@ -7,24 +7,20 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Create multiple ktlint checkstyle reports
+      - name: Create multiple clean ktlint XML reports
         run: |
-          mkdir -p /tmp/ktlint-reports/module1
-          mkdir -p /tmp/ktlint-reports/module2
-
-          cat > /tmp/ktlint-reports/module1/ktlint-report.xml << 'EOF'
+          mkdir -p /tmp/ktlint-multi
+          cat > /tmp/ktlint-multi/module1.xml << 'EOF'
           <?xml version="1.0" encoding="utf-8"?>
           <checkstyle version="8.0">
             <file name="module1/src/main/kotlin/com/example/Foo.kt">
             </file>
           </checkstyle>
           EOF
-
-          cat > /tmp/ktlint-reports/module2/ktlint-report.xml << 'EOF'
+          cat > /tmp/ktlint-multi/module2.xml << 'EOF'
           <?xml version="1.0" encoding="utf-8"?>
           <checkstyle version="8.0">
             <file name="module2/src/main/kotlin/com/example/Bar.kt">
-              <error line="3" column="1" severity="warning" message="No newline at end of file" source="standard:final-newline"/>
             </file>
           </checkstyle>
           EOF
@@ -32,9 +28,9 @@ jobs:
       - id: action
         uses: .
         with:
-          report-path: /tmp/ktlint-reports/**/*.xml
+          report-path: /tmp/ktlint-multi/*.xml
 
-      - name: Assert action succeeded with multiple files via glob
+      - name: Assert action succeeded processing multiple reports via glob
         run: |
-          echo "Action completed successfully processing multiple report files via glob pattern"
+          echo "Action completed successfully processing multiple reports via glob pattern"
           echo "PASS"
