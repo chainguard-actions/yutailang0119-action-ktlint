@@ -1,0 +1,39 @@
+name: Test ktlint report with errors (action should fail)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create ktlint report with errors
+        run: |
+          mkdir -p /tmp/ktlint-reports
+          cat > /tmp/ktlint-reports/report.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <checkstyle version="8.0">
+            <file name="src/main/kotlin/com/example/Main.kt">
+              <error line="3" column="1" severity="error" message="Exceeded max line length (120)" source="standard:max-line-length"/>
+              <error line="7" column="5" severity="error" message="Missing trailing comma" source="standard:trailing-comma-on-call-site"/>
+            </file>
+          </checkstyle>
+          EOF
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          report-path: /tmp/ktlint-reports/report.xml
+
+      - name: Assert action failed due to errors in report
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action correctly failed when ktlint errors were found"
+          else
+            echo "FAIL: expected action to fail with ktlint errors, but got outcome '$OUTCOME'"
+            exit 1
+          fi

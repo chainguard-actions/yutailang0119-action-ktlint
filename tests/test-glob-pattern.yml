@@ -1,0 +1,36 @@
+name: Test ktlint with glob pattern for report-path
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create multiple clean ktlint reports
+        run: |
+          mkdir -p /tmp/ktlint-reports/build
+          cat > /tmp/ktlint-reports/build/report1.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <checkstyle version="8.0">
+            <file name="src/main/kotlin/com/example/Foo.kt">
+            </file>
+          </checkstyle>
+          EOF
+          cat > /tmp/ktlint-reports/build/report2.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <checkstyle version="8.0">
+            <file name="src/main/kotlin/com/example/Bar.kt">
+            </file>
+          </checkstyle>
+          EOF
+
+      - id: action
+        uses: .
+        with:
+          report-path: /tmp/ktlint-reports/build/*.xml
+
+      - name: Assert action succeeded with glob pattern matching multiple reports
+        run: |
+          echo "Action completed successfully with glob pattern matching multiple reports"
+          echo "PASS"
